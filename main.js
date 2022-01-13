@@ -1,13 +1,29 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 const isDev = require('electron-is-dev');
 
 let devtools = null
+
+ipcMain.on('select-files', (e)=>{
+    dialog.showOpenDialog({
+        properties: ['openFile', 'multiSelections']})
+        .then(result=>{
+          //console.log(result.canceled)
+          console.log(result.filePaths)
+    
+          e.reply('file-list', result.filePaths)
+        //   fileWatcher.on('change', path => {
+        //     console.log(`File ${path} has been changed`);
+        //   }) 
+        }).catch(err=>{
+          console.log(err)
+        })
+})
 
 function createWindow() {
     const win = new BrowserWindow({
         width: 800,
         height: 600,
-        x: 100,
+        x: 1200,
         y: 0,
         webPreferences: {
           contextIsolation: false,
@@ -19,7 +35,7 @@ function createWindow() {
     win.loadURL(isDev ? 'http://localhost:3000' : `file://${__dirname}/build/index.html`);
     
     //把devtools放在一个单独的窗口中并与主窗口分开显示，以免对主窗口中的内容产生干扰
-    devtools = new BrowserWindow({x:1000, y:0})
+    devtools = new BrowserWindow({x:2300, y:300})
     win.webContents.setDevToolsWebContents(devtools.webContents)
     win.webContents.openDevTools({ mode: 'detach' ,activate: 'false'})
 }
