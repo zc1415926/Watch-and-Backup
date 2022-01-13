@@ -1,7 +1,20 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 const isDev = require('electron-is-dev');
+const fs = require('fs')
+const moment = require('moment')
 
 let devtools = null
+
+ipcMain.handle('app-path', ()=>{
+    return app.getPath('desktop')
+})
+
+//主进程写入文件，这里要传参数别忘了默认第一个参数是event
+ipcMain.handle('write-image', (e, data) =>{
+    const timestamp = moment(new Date()).format('YYYY.MM.DD-HH.MM.SS-X')
+    console.log(timestamp)
+    fs.writeFile(`./${timestamp}.jpg`, data, console.log)
+})
 
 ipcMain.on('select-files', (e)=>{
     dialog.showOpenDialog({

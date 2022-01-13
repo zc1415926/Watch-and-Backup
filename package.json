@@ -2,7 +2,6 @@
   "name": "watch-file-change-to-backup",
   "version": "0.1.0",
   "private": true,
-
   "zc1415926-comment003": "entry of electron",
   "add to .npmrc 01": "ELECTRON_MIRROR=https://cdn.npm.taobao.org/dist/electron/",
   "add to .npmrc 02": "electron-builder-binaries_mirror=https://npm.taobao.org/mirrors/electron-builder-binaries/",
@@ -19,15 +18,17 @@
   },
   "nodemonConfig": {
     "zc1415926-comment004": "修改React的文件不用重启Electron",
-    "ignore": ["src/*"]
+    "ignore": [
+      "src/*"
+    ]
   },
-  "end-of-zc1415926-comment003":"",
-
+  "end-of-zc1415926-comment003": "",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
     "electron-is-dev": "^2.0.0",
+    "moment": "^2.29.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "5.0.0",
@@ -39,7 +40,6 @@
     "build-electron": "electron-builder -w --ia32",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    
     "zc1415926-comment001": "Down there, re is short for React in Electron. Run: npm run re which can autoload react and electron",
     "re": "concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && nodemon --exec electron .\""
   },

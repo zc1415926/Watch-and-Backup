@@ -1,5 +1,6 @@
 import Navbar from './Navbar';
 import FileList from './FileList';
+import Capture from './Capture';
 
 function App() {
   return (
@@ -7,6 +8,7 @@ function App() {
       <Navbar />
       <div className="content">
         <FileList />
+        <Capture />
       </div>
     </div>
   );
