@@ -19,7 +19,8 @@
   "nodemonConfig": {
     "zc1415926-comment004": "修改React的文件不用重启Electron",
     "ignore": [
-      "src/*"
+      "src/*",
+      "./setting.json"
     ]
   },
   "end-of-zc1415926-comment003": "",

@@ -56,8 +56,32 @@ ipcMain.handle('delete-file', async(e, fileName)=>{
 
     return fileName + ' removed'
 })
+ipcMain.handle('write-setting', async (e, data)=>{
+    settingObj = {"captureFiles": data}
 
-ipcMain.on('select-files', (e)=>{
+    try {
+        await fs.outputJson('./setting.json', settingObj)
+    } catch (error) {
+        console.error(error)
+    }
+})
+ipcMain.handle('get-setting-file', async ()=>{
+    
+    let setting = {}
+
+    try {
+        setting = await fs.readJSON('./setting.json')
+    } catch (error) {
+       // console.error(error)
+        console.error(error.message)
+        console.error(error.name)
+        setting = {}
+    }
+
+    return setting
+})
+ 
+ipcMain.on('select-files1', (e)=>{
     dialog.showOpenDialog({
         properties: ['openFile', 'multiSelections']})
         .then(result=>{
@@ -71,6 +95,14 @@ ipcMain.on('select-files', (e)=>{
         }).catch(err=>{
           console.log(err)
         })
+})
+
+ipcMain.handle('select-files', async (e)=>{
+    const result = await dialog.showOpenDialog({properties: ['openFile', 'multiSelections']})
+    console.log(result.canceled)
+    console.log(result.filePaths)
+    
+    return result.filePaths
 })
 
 function createWindow() {
