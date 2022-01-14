@@ -41,9 +41,20 @@ ipcMain.handle('capture-screen', async ()=>{
     //使用moment模块来生成一个方便人看，同时又不会重复的文件名，“-X”是Linux时间戳
     const timestamp = moment(new Date()).format('YYYY.MM.DD-HH.mm.ss-X')
     //使用fs-extra模块异步写入文件，等文件写入完成后，再完成handle函数，返回到invoke
-    await fs.outputFile(`./Capture_${timestamp}.jpg`, imageJpg)
+    await fs.outputFile(`./Capture-${timestamp}.jpg`, imageJpg)
     
     return imageJpg
+})
+
+ipcMain.handle('delete-file', async(e, fileName)=>{
+
+    try {
+        await fs.remove('./'+fileName)
+    } catch (error) {
+        console.error(error)
+    }
+
+    return fileName + ' removed'
 })
 
 ipcMain.on('select-files', (e)=>{

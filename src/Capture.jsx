@@ -65,6 +65,18 @@ class Capture extends React.Component{
                 this.setState({captureFiles: files})
             })
     }
+
+    onDeleteCaptureClicked(fileName){
+        ipcRenderer.invoke('delete-file', fileName)
+            // .then((res)=>{
+            //     console.log(res)
+            // })
+            .then(()=>getCaptureFiles())
+            .then((files)=>{
+                this.setState({captureFiles: files})
+            })
+    }
+
  
     componentDidMount(){ 
         //一开始运行程序，首先读取一次所有文件
@@ -93,6 +105,7 @@ class Capture extends React.Component{
                             <div key={fileName}>
                                 <h2>{fileName}</h2>
                                 <img src={img.toDataURL()} />
+                                <button onClick={()=>this.onDeleteCaptureClicked(fileName)}>x</button>
                             </div>
                         )
                     })
