@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, nativeImage} = require('electron')
+const { app, BrowserWindow, ipcMain, dialog, nativeImage, desktopCapturer} = require('electron')
 const isDev = require('electron-is-dev');
 const fs = require('fs-extra')
 const moment = require('moment')
@@ -21,15 +21,29 @@ ipcMain.handle('get-capture-files', ()=>{
 })
 
 //主进程写入文件，这里要传参数别忘了默认第一个参数是event
-ipcMain.handle('write-image', async (e, data) =>{
+// ipcMain.handle('write-image', async (e, data) =>{
+
+//     //使用moment模块来生成一个方便人看，同时又不会重复的文件名，“-X”是Linux时间戳
+//     const timestamp = moment(new Date()).format('YYYY.MM.DD-HH.mm.ss-X')
+//     //使用fs-extra模块异步写入文件，等文件写入完成后，再完成handle函数，返回到invoke
+//     await fs.outputFile(`./Capture_${timestamp}.jpg`, data)
+
+//     //这里返回的文件名在renderer里没有用到
+//     return `./Capture_${timestamp}.jpg`
+// })
+
+ipcMain.handle('capture-screen', async ()=>{
+    //截图现在只能在主进程里进行：https://www.electronjs.org/docs/latest/breaking-changes#removed-desktopcapturergetsources-in-the-renderer
+    const sources = await desktopCapturer.getSources({types: ['screen']})
+    //把第一个屏幕的截图转换成90%的JPEG数据
+    const imageJpg = sources[0].thumbnail.toJPEG(90);
 
     //使用moment模块来生成一个方便人看，同时又不会重复的文件名，“-X”是Linux时间戳
     const timestamp = moment(new Date()).format('YYYY.MM.DD-HH.mm.ss-X')
     //使用fs-extra模块异步写入文件，等文件写入完成后，再完成handle函数，返回到invoke
-    await fs.outputFile(`./Capture_${timestamp}.jpg`, data)
-
-    //这里返回的文件名在renderer里没有用到
-    return `./Capture_${timestamp}.jpg`
+    await fs.outputFile(`./Capture_${timestamp}.jpg`, imageJpg)
+    
+    return imageJpg
 })
 
 ipcMain.on('select-files', (e)=>{

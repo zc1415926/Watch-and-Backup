@@ -16,6 +16,7 @@ const saveToDesk = async(data)=>{
 } 
 
 //让一个变量名=>一个async的匿名函数，这种写法可以在匿名函数里使用await调用异步函数
+//componentDidMount里调用了这个函数
 const getCaptureFiles = async()=>{
     //await后边的函数执行完成后，captureFiles才会收到值，然后才执行return那一步
     let captureFiles = await ipcRenderer.invoke('get-capture-files')
@@ -34,23 +35,31 @@ class Capture extends React.Component{
 
     onCaptureScreenClicked(){
         //按下截图按钮后，调用截图函数
-        desktopCapturer.getSources({types: ['screen']})
-            .then(sources=>{
-                //直接把图片转换成URL放到img标签的src里就可以显示
-                //this.setState({imgsrc: sources[0].thumbnail.toDataURL()})
-                //const image = nativeImage.createFromDataURL(sources[0].thumbnail.toDataURL())
-                //把截到的数据转换成90%的JPEG
-                const imageJpg = sources[0].thumbnail.toJPEG(90);
-                //返回数据，完成本层的then函数
-                return imageJpg
-            })
+        // desktopCapturer.getSources({types: ['screen']})
+        //     .then(sources=>{
+        //         //直接把图片转换成URL放到img标签的src里就可以显示
+        //         //this.setState({imgsrc: sources[0].thumbnail.toDataURL()})
+        //         //const image = nativeImage.createFromDataURL(sources[0].thumbnail.toDataURL())
+        //         //把截到的数据转换成90%的JPEG
+        //         const imageJpg = sources[0].thumbnail.toJPEG(90);
+        //         //返回数据，完成本层的then函数
+        //         return imageJpg
+        //     })
+            ipcRenderer.invoke('capture-screen')
             //写入图片文件，“匿名函数=>调用函数”这样的形式就是当调用的函数return时，完成本层的then
-            .then((imageJpg)=>saveToDesk(imageJpg))
+        //    .then((imageJpg)=>saveToDesk(imageJpg))
             //这一层的then意思和上一层一样，只不过上一个是简写，本个then是完整形式
             //完成文件写入后，调用读取全部文件函数
-            .then(()=>{
-                return getCaptureFiles()
-            })
+            // .then(()=>{
+            //     return getCaptureFiles()
+            // })
+
+            //get-capture-files handler中返回的值会自动传入到下一个then
+            //相当于把class外边的getCaptureFiles函数简化
+            //async可以放在匿名函数的括号外边
+            //.then(async()=>await ipcRenderer.invoke('get-capture-files'))
+            //调用异步函数getCaptureFiles()
+            .then(()=>getCaptureFiles())
             //所有文件读取完成后，调用setState，更新dom
             .then((files)=>{
                 this.setState({captureFiles: files})
