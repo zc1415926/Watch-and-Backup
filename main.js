@@ -1,19 +1,35 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog, nativeImage} = require('electron')
 const isDev = require('electron-is-dev');
-const fs = require('fs')
+const fs = require('fs-extra')
 const moment = require('moment')
+const shelljs = require('shelljs')
 
 let devtools = null
 
-ipcMain.handle('app-path', ()=>{
-    return app.getPath('desktop')
+//在这里获取本地文件夹中的截图文件
+ipcMain.handle('get-capture-files', ()=>{
+
+    let captureFiles = [];
+
+    //shelljs.ls()的固定写法就是后边接一个forEach来处理里边的第一项，这里把他们放到一个新的数组里边去
+    shelljs.ls('Capture*.jpg').forEach(element => {
+        captureFiles.push(app.getAppPath()+ '\\'+element);
+    }); 
+
+    //返回的就是所有截图文件完整地址的数组
+    return captureFiles
 })
 
 //主进程写入文件，这里要传参数别忘了默认第一个参数是event
-ipcMain.handle('write-image', (e, data) =>{
-    const timestamp = moment(new Date()).format('YYYY.MM.DD-HH.MM.SS-X')
-    console.log(timestamp)
-    fs.writeFile(`./${timestamp}.jpg`, data, console.log)
+ipcMain.handle('write-image', async (e, data) =>{
+
+    //使用moment模块来生成一个方便人看，同时又不会重复的文件名，“-X”是Linux时间戳
+    const timestamp = moment(new Date()).format('YYYY.MM.DD-HH.mm.ss-X')
+    //使用fs-extra模块异步写入文件，等文件写入完成后，再完成handle函数，返回到invoke
+    await fs.outputFile(`./Capture_${timestamp}.jpg`, data)
+
+    //这里返回的文件名在renderer里没有用到
+    return `./Capture_${timestamp}.jpg`
 })
 
 ipcMain.on('select-files', (e)=>{
