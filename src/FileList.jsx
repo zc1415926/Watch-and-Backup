@@ -25,7 +25,7 @@ class FileList extends React.Component{
             <div className="div filelist">
                 <h2>Files will be watching</h2>
                 {this.state.list.map((item)=>(
-                    <div className='item'>{item}</div>))}
+                    <div className='item' key={item}>{item}</div>))}
 
                 <button onClick={()=>this.onSelectFilesClicked()}>Select Files</button>
             </div>
